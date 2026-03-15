@@ -254,6 +254,17 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;");
 }
 
+function openExternalLink(url) {
+  if (!url) return;
+
+  if (tg?.openLink) {
+    tg.openLink(url);
+    return;
+  }
+
+  window.open(url, "_blank", "noopener,noreferrer");
+}
+
 async function bootstrap() {
   const telegramId = getTelegramId();
   const username = encodeURIComponent(getTelegramUsername());
@@ -535,7 +546,13 @@ function renderSubscription() {
           </div>
 
           <div class="bottom-actions">
-            <a class="primary-btn" href="${product.link}" target="_blank">${tr("openLink")}</a>
+            <button
+              class="primary-btn open-product-btn"
+              data-link="${escapeHtml(product.link)}"
+              type="button"
+            >
+              ${tr("openLink")}
+            </button>
           </div>
         </div>
       ` : ""}
@@ -728,6 +745,12 @@ function bindEvents() {
       await bootstrap();
       currentScreen = "admin";
       render();
+    });
+  });
+
+  document.querySelectorAll(".open-product-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      openExternalLink(btn.dataset.link);
     });
   });
 }
