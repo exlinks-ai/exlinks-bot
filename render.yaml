@@ -1,0 +1,20 @@
+services:
+  - type: worker
+    name: exlinks-ai-bot
+    env: python
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python main.py
+    envVars:
+      - key: BOT_TOKEN
+        sync: false
+      - key: ADMIN_IDS
+        sync: false
+      - key: SUPPORT_CHAT_ID
+        sync: false
+      - key: DATABASE_URL
+        sync: false
+      - key: BRAND_NAME
+        value: exlinks.ai
+      - key: DELIVERY_CHECK_SECONDS
+        value: "60"
