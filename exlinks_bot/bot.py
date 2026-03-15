@@ -542,32 +542,11 @@ class ExLinksBot:
             return
 
     async def delivery_job(self, context: ContextTypes.DEFAULT_TYPE) -> None:
+     
         now = utc_now()
 
-        expired_users = self.db.get_expired_users(now)
-        for user in expired_users:
-            try:
-                self.db.deactivate_package(user.telegram_id)
-
-                language = user.language_code or "en"
-                try:
-                    await context.application.bot.send_message(
-                        chat_id=user.telegram_id,
-                        text=tr(language, "package_expired_user"),
-                        parse_mode=ParseMode.HTML,
-                    )
-                except TelegramError:
-                    logger.warning("Could not notify user %s about package expiry", user.telegram_id)
-
-                await self.notify_admins(
-                    context.application,
-                    tr("az", "package_expired_admin", telegram_id=user.telegram_id),
-                )
-            except Exception as exc:
-                logger.exception("Expiry processing failed for user %s: %s", user.telegram_id, exc)
-
-        due_users = self.db.get_due_users(now)
-
+     due_users = self.db.get_due_users(now)
+        
         for user in due_users:
             try:
                 await self.deliver_one_product(context.application, user)
