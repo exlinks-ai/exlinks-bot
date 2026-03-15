@@ -478,8 +478,8 @@ function renderSubscription() {
   const product = state.product;
 
   let productText = tr("noProduct");
-  if (product.mode === "latest") productText = tr("latestProduct");
-  if (product.mode === "next") productText = tr("nextProduct");
+  if (product?.mode === "latest") productText = tr("latestProduct");
+  if (product?.mode === "next") productText = tr("nextProduct");
 
   return `
     <div class="screen">
@@ -507,37 +507,35 @@ function renderSubscription() {
         </div>
       `}
 
-      <div class="product-card">
-        <div class="white-label">${tr("productTitle")}</div>
-        <h3>${escapeHtml(product.name)}</h3>
-        <p>${productText}</p>
+      ${sub.active ? `
+        <div class="product-card">
+          <div class="white-label">${tr("productTitle")}</div>
+          <h3>${escapeHtml(product?.name || "")}</h3>
+          <p>${productText}</p>
 
-
-
-
-      <div class="product-meta">
-     <div class="product-meta-row">
-        <span>${tr("source")}</span>
-       <b>Amazon</b>
-        </div>
+          <div class="product-meta">
+            <div class="product-meta-row">
+              <span>${tr("source")}</span>
+              <b>Amazon</b>
+            </div>
           </div>
 
-
-
-        <div class="bottom-actions">
-          <a class="primary-btn" href="${product.link || "#"}" target="_blank">${tr("openLink")}</a>
+          <div class="bottom-actions">
+            <a class="primary-btn" href="${product?.link || "#"}" target="_blank">${tr("openLink")}</a>
+          </div>
         </div>
+      ` : ""}
+
+      <div class="card section">
+        <div class="info-row"><span>${tr("telegramId")}</span><b>${state.user.telegram_id}</b></div>
       </div>
 
-    <div class="card section">
-  <div class="info-row"><span>${tr("telegramId")}</span><b>${state.user.telegram_id}</b></div>
-</div>
-
-<a class="whatsapp-id-card section" href="${buildWhatsappIdLink()}" target="_blank">
-  <div class="whatsapp-id-title">${tr("whatsappIdTitle")}</div>
-  <div class="whatsapp-id-value">${state.user.telegram_id}</div>
-  <div class="whatsapp-id-sub">${tr("whatsappIdSub")}</div>
-</a>
+      <a class="whatsapp-id-card section" href="${buildWhatsappIdLink()}" target="_blank">
+        <div class="whatsapp-id-title">${tr("whatsappIdTitle")}</div>
+        <div class="whatsapp-id-value">${state.user.telegram_id}</div>
+        <div class="whatsapp-id-sub">${tr("whatsappIdSub")}</div>
+      </a>
+    </div>
   `;
 }
 
