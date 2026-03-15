@@ -14,7 +14,6 @@ const WHATSAPP_LINK = `https://wa.me/${WHATSAPP_NUMBER}`;
 const INSTAGRAM_LINK = "https://www.instagram.com/exlinks.ai/";
 const TELEGRAM_GROUP_LINK = "https://t.me/+RRwv5voUSNUyMDMy";
 
-
 let state = null;
 let currentScreen = "welcome";
 
@@ -34,7 +33,7 @@ const texts = {
     contact: "Haqqımızda",
     contactSub: "Biz kimik və əlaqə",
     aboutTitle: "Haqqımızda",
-    aboutText: "ExLinks AI, eBay dropshipping satıcıları üçün seçilmiş uğurlu məhsul linkləri təqdim  edir. Məqsədimiz satıcılara məhsul araşdırmasını sürətləndirmək, doğru məhsulları tapmaq və işlərini daha rahat idarə etmələrinə dəstək olmaqdır.",
+    aboutText: "ExLinks AI, eBay dropshipping satıcıları üçün seçilmiş uğurlu məhsul linkləri təqdim edir. Məqsədimiz satıcılara məhsul araşdırmasını sürətləndirmək, doğru məhsulları tapmaq və işlərini daha rahat idarə etmələrinə dəstək olmaqdır.",
     instagram: "Instagram",
     whatsapp: "WhatsApp",
     telegram: "Telegram",
@@ -42,6 +41,7 @@ const texts = {
     changeLanguageSub: "AZ / EN / RU",
     currentPlan: "Cari Paket",
     nextDelivery: "Növbəti Göndəriş",
+    expiresAt: "Bitmə tarixi",
     active: "Aktiv",
     inactive: "Deaktiv",
     noSubscription: "Səndə hələ aktiv paket yoxdur.",
@@ -51,7 +51,7 @@ const texts = {
     yourId: "Sənin Telegram ID-n",
     productTitle: "Məhsul",
     latestProduct: "Sənə son göndərilən məhsul",
-    nextProduct: "Sənə növbəti veriləcək məhsul.",
+    nextProduct: "Sənə növbəti veriləcək məhsul",
     noProduct: "Hələ məhsul yoxdur.",
     source: "Mənbə",
     status: "Status",
@@ -65,16 +65,18 @@ const texts = {
     send: "Göndər",
     sent: "Göndərildi",
     adminUsers: "İstifadəçilər",
+    adminMessages: "Mesajlar",
     activate: "Aktiv et",
     deactivate: "Deaktiv et",
     back: "Geri",
     currentBadge: "Cari plan",
     failed: "App yüklənmədi.",
-    intervalDays3: "3 günlük interval",
-    intervalDays2: "2 günlük interval",
-    intervalDays1: "1 günlük interval",
+    intervalDays3: "3 gündən bir",
+    intervalDays2: "2 gündən bir",
+    intervalDays1: "Hər gün",
     whatsappIdTitle: "Paketi aktivləşdirmək üçün ID-ni adminə göndər",
     whatsappIdSub: "WhatsApp ilə göndər",
+    noMessages: "Hələ mesaj yoxdur.",
   },
   en: {
     heroTitle: "Successful product links",
@@ -99,6 +101,7 @@ const texts = {
     changeLanguageSub: "AZ / EN / RU",
     currentPlan: "Current Plan",
     nextDelivery: "Next Delivery",
+    expiresAt: "Expires At",
     active: "Active",
     inactive: "Inactive",
     noSubscription: "You do not have an active subscription yet.",
@@ -108,7 +111,7 @@ const texts = {
     yourId: "Your Telegram ID",
     productTitle: "Product",
     latestProduct: "Your latest delivered product",
-    nextProduct: "Your next available product.",
+    nextProduct: "Your next available product",
     noProduct: "No product yet.",
     source: "Source",
     status: "Status",
@@ -122,16 +125,18 @@ const texts = {
     send: "Send",
     sent: "Sent",
     adminUsers: "Users",
+    adminMessages: "Messages",
     activate: "Activate",
     deactivate: "Deactivate",
     back: "Back",
     currentBadge: "Current plan",
     failed: "Failed to load app.",
-    intervalDays3: "3-day interval",
-    intervalDays2: "2-day interval",
-    intervalDays1: "1-day interval",
-    whatsappIdTitle: "Paketi aktivləşdirmək üçün ID-ni adminə göndər",
-    whatsappIdSub: "WhatsApp ilə göndər",
+    intervalDays3: "Every 3 days",
+    intervalDays2: "Every 2 days",
+    intervalDays1: "Every day",
+    whatsappIdTitle: "Send your ID to the admin to activate the package",
+    whatsappIdSub: "Send via WhatsApp",
+    noMessages: "No messages yet.",
   },
   ru: {
     heroTitle: "Успешные товарные ссылки",
@@ -156,6 +161,7 @@ const texts = {
     changeLanguageSub: "AZ / EN / RU",
     currentPlan: "Текущий тариф",
     nextDelivery: "Следующая отправка",
+    expiresAt: "Дата окончания",
     active: "Активен",
     inactive: "Неактивен",
     noSubscription: "У вас пока нет активной подписки.",
@@ -165,7 +171,7 @@ const texts = {
     yourId: "Ваш Telegram ID",
     productTitle: "Товар",
     latestProduct: "Ваш последний отправленный товар",
-    nextProduct: "Ваш следующий доступный товар.",
+    nextProduct: "Ваш следующий доступный товар",
     noProduct: "Пока нет товара.",
     source: "Источник",
     status: "Статус",
@@ -179,16 +185,18 @@ const texts = {
     send: "Отправить",
     sent: "Отправлено",
     adminUsers: "Пользователи",
+    adminMessages: "Сообщения",
     activate: "Активировать",
     deactivate: "Деактивировать",
     back: "Назад",
     currentBadge: "Текущий тариф",
     failed: "Не удалось загрузить приложение.",
-    intervalDays3: "Интервал 3 дня",
-    intervalDays2: "Интервал 2 дня",
-    intervalDays1: "Интервал 1 день",
-    whatsappIdTitle: "Send your ID to the admin to activate the package",
-    whatsappIdSub: "Send via WhatsApp",
+    intervalDays3: "Каждые 3 дня",
+    intervalDays2: "Каждые 2 дня",
+    intervalDays1: "Каждый день",
+    whatsappIdTitle: "Отправьте свой ID администратору для активации пакета",
+    whatsappIdSub: "Отправить через WhatsApp",
+    noMessages: "Сообщений пока нет.",
   },
 };
 
@@ -308,10 +316,6 @@ function formatLocalDateTime(value) {
   if (!value || value === "-") return "-";
   if (typeof value !== "string") return String(value);
 
-
-  console.log("NEXT DELIVERY RAW:", value);
-  console.log("DISPLAY TZ:", getDisplayTimeZone());
-
   const cleaned = value.replace(" UTC", "").trim();
   const parts = cleaned.split(" ");
   if (parts.length < 2) return value;
@@ -343,8 +347,6 @@ function formatLocalDateTime(value) {
     hour12: false,
   }).format(utcDate);
 }
-
-
 
 function buildWhatsappIdLink() {
   const message = `Salam. Paket aktivləşdirmək istəyirəm. Telegram ID: ${state.user.telegram_id}`;
@@ -422,7 +424,7 @@ function renderHome() {
           ${state.user.is_admin ? `
             <button class="menu-button" id="adminBtn">
               <strong>${tr("adminMenu")}</strong>
-              <small>${tr("adminUsers")} / ${tr("")}</small>
+              <small>${tr("adminUsers")} / ${tr("adminMessages")}</small>
             </button>
           ` : ""}
         </div>
@@ -474,12 +476,17 @@ function renderPackages() {
 }
 
 function renderSubscription() {
-  const sub = state.subscription;
-  const product = state.product;
+  const sub = state.subscription || {};
+  const product = state.product || {};
+  const showProductCard =
+    sub.active &&
+    (product.mode === "latest" || product.mode === "next") &&
+    product.name &&
+    product.link;
 
   let productText = tr("noProduct");
-  if (product?.mode === "latest") productText = tr("latestProduct");
-  if (product?.mode === "next") productText = tr("nextProduct");
+  if (product.mode === "latest") productText = tr("latestProduct");
+  if (product.mode === "next") productText = tr("nextProduct");
 
   return `
     <div class="screen">
@@ -501,27 +508,34 @@ function renderSubscription() {
             <small>${tr("active")}</small>
           </div>
         </div>
+
+        <div class="card section">
+          <div class="info-row">
+            <span>${tr("expiresAt")}</span>
+            <b>${escapeHtml(formatLocalDateTime(sub.expires_at))}</b>
+          </div>
+        </div>
       ` : `
         <div class="card">
           <span>${tr("noSubscription")}</span>
         </div>
       `}
 
-      ${sub.active ? `
+      ${showProductCard ? `
         <div class="product-card">
           <div class="white-label">${tr("productTitle")}</div>
-          <h3>${escapeHtml(product?.name || "")}</h3>
+          <h3>${escapeHtml(product.name)}</h3>
           <p>${productText}</p>
 
           <div class="product-meta">
             <div class="product-meta-row">
-              <span>${tr("source")}</span>
-              <b>Amazon</b>
+              <span>${tr("status")}</span>
+              <b>${product.status === "ready" ? tr("ready") : tr("waiting")}</b>
             </div>
           </div>
 
           <div class="bottom-actions">
-            <a class="primary-btn" href="${product?.link || "#"}" target="_blank">${tr("openLink")}</a>
+            <a class="primary-btn" href="${product.link}" target="_blank">${tr("openLink")}</a>
           </div>
         </div>
       ` : ""}
@@ -552,26 +566,26 @@ function renderContact() {
       </div>
 
       <div class="social-grid section">
-          <a class="social-card telegram-card" href="${TELEGRAM_GROUP_LINK}" target="_blank">
-    <span class="social-title">${tr("telegram")}</span>
-           </a>
+        <a class="social-card telegram-card" href="${TELEGRAM_GROUP_LINK}" target="_blank">
+          <span class="social-title">${tr("telegram")}</span>
+        </a>
 
-      <a class="social-card instagram-card" href="${INSTAGRAM_LINK}" target="_blank">
-      <span class="social-title">${tr("instagram")}</span>
-         </a>
+        <a class="social-card instagram-card" href="${INSTAGRAM_LINK}" target="_blank">
+          <span class="social-title">${tr("instagram")}</span>
+        </a>
 
-     <a class="social-card whatsapp-card" href="${WHATSAPP_LINK}" target="_blank">
-       <span class="social-title">${tr("whatsapp")}</span>
-      </a>
-       </div>
+        <a class="social-card whatsapp-card" href="${WHATSAPP_LINK}" target="_blank">
+          <span class="social-title">${tr("whatsapp")}</span>
+        </a>
+      </div>
     </div>
   `;
 }
 
-
 function renderAdmin() {
   const users = state.admin?.users || [];
   const messages = state.admin?.messages || [];
+  const plans = state.plans || [];
 
   return `
     <div class="screen">
@@ -591,12 +605,19 @@ function renderAdmin() {
               </div>
               <div class="user-desc">ID: ${user.telegram_id}</div>
               <div class="user-desc">${escapeHtml(user.package_name || "-")}</div>
-              <div class="user-desc">${escapeHtml(user.next_delivery || "-")}</div>
+              <div class="user-desc">${escapeHtml(formatLocalDateTime(user.next_delivery || "-"))}</div>
+              <div class="user-desc">${escapeHtml(formatLocalDateTime(user.expires_at || "-"))}</div>
 
               <div class="user-actions">
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_3_days">9.99</button>
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_2_days">19.99</button>
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="daily">29.99</button>
+                ${plans.map(plan => `
+                  <button
+                    class="small-btn activate-btn"
+                    data-user="${user.telegram_id}"
+                    data-plan="${plan.code}"
+                  >
+                    ${escapeHtml(plan.price)}
+                  </button>
+                `).join("")}
                 <button class="small-btn danger deactivate-btn" data-user="${user.telegram_id}">${tr("deactivate")}</button>
               </div>
             </div>
@@ -605,9 +626,9 @@ function renderAdmin() {
       </div>
 
       <div class="section">
-        <h3 class="section-title">${tr("")}</h3>
+        <h3 class="section-title">${tr("adminMessages")}</h3>
         <div class="message-list">
-          ${messages.map(item => `
+          ${messages.length ? messages.map(item => `
             <div class="message-item">
               <div class="message-head">
                 <strong>${escapeHtml(item.user_name || "Unknown")}</strong>
@@ -616,7 +637,7 @@ function renderAdmin() {
               <div class="message-desc">ID: ${item.telegram_id}</div>
               <div class="message-desc">${escapeHtml(item.text)}</div>
             </div>
-          `).join("")}
+          `).join("") : `<div class="card"><span>${tr("noMessages")}</span></div>`}
         </div>
       </div>
     </div>
@@ -674,7 +695,6 @@ function bindEvents() {
   document.querySelectorAll("#backHomeBtn").forEach((btn) => {
     btn.addEventListener("click", () => go("home"));
   });
-
 
   document.querySelectorAll(".activate-btn").forEach((btn) => {
     btn.addEventListener("click", async () => {
