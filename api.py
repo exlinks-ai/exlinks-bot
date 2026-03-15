@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import timedelta
 from pathlib import Path
 
 from fastapi import FastAPI, HTTPException, Query
@@ -12,7 +13,7 @@ from sqlalchemy import select
 from exlinks_bot.config import PLANS, settings
 from exlinks_bot.db import Database, Delivery, Product, User
 from exlinks_bot.i18n import LANGUAGES, plan_label, plan_price
-from exlinks_bot.services import format_dt, next_delivery_for_plan
+from exlinks_bot.services import format_dt, next_delivery_for_plan, utc_now
 
 app = FastAPI(title="ExLinks Mini App API", version="2.0.0")
 
@@ -27,7 +28,9 @@ app.add_middleware(
 db = Database(settings.database_url)
 db.init_db()
 
-MINIAPP_DIR = Path("exlinks_miniapp")
+BASE_DIR = Path(__file__).resolve().parent
+MINIAPP_DIR = BASE_DIR / "exlinks_miniapp"
+
 if MINIAPP_DIR.exists():
     app.mount("/miniapp", StaticFiles(directory=str(MINIAPP_DIR), html=True), name="miniapp")
 
@@ -99,6 +102,7 @@ def bootstrap(
             "price": plan_price(language, user.package_code) if user.package_code else "-",
             "started_at": format_dt(user.package_started_at),
             "next_delivery": format_dt(user.next_delivery_at),
+            "expires_at": format_dt(user.package_expires_at),
         },
         "plans": plans,
         "product": latest_or_next,
@@ -148,7 +152,13 @@ def admin_package(payload: AdminPackagePayload) -> dict:
         raise HTTPException(status_code=400, detail="Invalid package code")
 
     next_delivery = next_delivery_for_plan(payload.package_code)
-    db.set_package(payload.target_telegram_id, payload.package_code, next_delivery)
+    package_expires_at = utc_now() + timedelta(days=30)
+    db.set_package(
+        payload.target_telegram_id,
+        payload.package_code,
+        next_delivery,
+        package_expires_at,
+    )
     return {"ok": True, "status": "activated"}
 
 
@@ -195,6 +205,7 @@ def get_me(
             "price": plan_price(language, user.package_code) if user.package_code else "-",
             "started_at": format_dt(user.package_started_at),
             "next_delivery": format_dt(user.next_delivery_at),
+            "expires_at": format_dt(user.package_expires_at),
         },
         "plans": plans,
         "product": latest_or_next,
@@ -207,6 +218,14 @@ def root():
     if index_file.exists():
         return FileResponse(index_file)
     return {"message": "ExLinks API is running"}
+
+
+@app.get("/miniapp")
+def miniapp_root():
+    index_file = MINIAPP_DIR / "index.html"
+    if index_file.exists():
+        return FileResponse(index_file)
+    raise HTTPException(status_code=404, detail="Mini app not found")
 
 
 def _get_latest_or_next_product(user: User) -> dict:
@@ -253,8 +272,8 @@ def _get_latest_or_next_product(user: User) -> dict:
 
     return {
         "mode": "empty",
-        "name": "No product yet",
-        "link": "#",
+        "name": "",
+        "link": "",
         "status": "waiting",
     }
 
@@ -273,6 +292,7 @@ def _admin_users(language: str) -> list[dict]:
                 "package_name": plan_label(language, user.package_code) if user.package_code else "-",
                 "active": bool(user.package_active),
                 "next_delivery": format_dt(user.next_delivery_at),
+                "expires_at": format_dt(user.package_expires_at),
             }
         )
 
