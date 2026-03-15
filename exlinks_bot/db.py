@@ -38,6 +38,7 @@ class User(Base):
     package_active: Mapped[bool] = mapped_column(Boolean, default=False)
     package_started_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     next_delivery_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    package_expires_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -161,16 +162,24 @@ class Database:
             user.language_code = language_code
             user.updated_at = datetime.now(timezone.utc)
 
-    def set_package(self, telegram_id: int, package_code: str, next_delivery_at: datetime) -> User | None:
+    def set_package(
+        self,
+        telegram_id: int,
+        package_code: str,
+        next_delivery_at: datetime,
+        package_expires_at: datetime,
+    ) -> User | None:
         with self.session() as session:
             user = session.scalar(select(User).where(User.telegram_id == telegram_id))
             if user is None:
                 return None
+
             now = datetime.now(timezone.utc)
             user.package_started_at = now
             user.package_code = package_code
             user.package_active = True
             user.next_delivery_at = next_delivery_at
+            user.package_expires_at = package_expires_at
             user.updated_at = now
             session.flush()
             return user
@@ -180,8 +189,12 @@ class Database:
             user = session.scalar(select(User).where(User.telegram_id == telegram_id))
             if user is None:
                 return None
+
             user.package_active = False
+            user.package_code = None
+            user.package_started_at = None
             user.next_delivery_at = None
+            user.package_expires_at = None
             user.updated_at = datetime.now(timezone.utc)
             session.flush()
             return user
@@ -201,6 +214,16 @@ class Database:
                 User.package_code.is_not(None),
                 User.next_delivery_at.is_not(None),
                 User.next_delivery_at <= now,
+            )
+            return list(session.scalars(stmt).all())
+
+    def get_expired_users(self, now: datetime) -> list[User]:
+        with self.session() as session:
+            stmt = select(User).where(
+                User.package_active.is_(True),
+                User.package_code.is_not(None),
+                User.package_expires_at.is_not(None),
+                User.package_expires_at <= now,
             )
             return list(session.scalars(stmt).all())
 
