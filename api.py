@@ -210,6 +210,14 @@ def root():
 
 
 def _get_latest_or_next_product(user: User) -> dict:
+    if not user.package_active or not user.package_code:
+        return {
+            "mode": "locked",
+            "name": "",
+            "link": "",
+            "status": "waiting",
+        }
+
     with db.session() as session:
         latest_delivery = session.execute(
             select(Delivery, Product)
