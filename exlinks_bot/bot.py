@@ -6,7 +6,7 @@ import math
 from datetime import timedelta
 from typing import Any, Awaitable, Callable
 
-from telegram import Update
+from telegram import ReplyKeyboardRemove, Update
 from telegram.constants import ParseMode
 from telegram.error import TelegramError
 from telegram.ext import (
@@ -68,9 +68,12 @@ class ExLinksBot:
         context.user_data.clear()
 
         await update.message.reply_text(
-            tr("en", "choose_language", brand=self.settings.brand_name),
-            reply_markup=language_keyboard(),
+            f"<b>{html.escape(self.settings.brand_name)}</b>-ə xoş gəlmisiniz.\n\n"
+            "Zəhmət olmasa tətbiqə keçin:\n"
+            "https://t.me/exlinks_ai_bot?startapp",
             parse_mode=ParseMode.HTML,
+            disable_web_page_preview=True,
+            reply_markup=ReplyKeyboardRemove(),
         )
 
     async def show_menu_command(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
