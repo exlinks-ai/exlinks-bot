@@ -44,6 +44,7 @@ class ExLinksBot:
 
     def build_application(self) -> Application:
         application = Application.builder().token(self.settings.bot_token).build()
+        application.add_error_handler(self.error_handler)
         application.add_handler(CommandHandler("start", self.start))
         application.add_handler(CommandHandler("menu", self.show_menu_command))
         application.add_handler(CallbackQueryHandler(self.handle_callback))
@@ -55,6 +56,9 @@ class ExLinksBot:
             name="delivery-checker",
         )
         return application
+
+    async def error_handler(self, update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+        logger.exception("Unhandled exception while processing update: %s", context.error)
 
     async def start(self, update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if update.effective_user is None or update.message is None:
@@ -542,11 +546,32 @@ class ExLinksBot:
             return
 
     async def delivery_job(self, context: ContextTypes.DEFAULT_TYPE) -> None:
-     
         now = utc_now()
 
-     due_users = self.db.get_due_users(now)
-        
+        expired_users = self.db.get_expired_users(now)
+        for user in expired_users:
+            try:
+                self.db.deactivate_package(user.telegram_id)
+
+                language = user.language_code or "en"
+                try:
+                    await context.application.bot.send_message(
+                        chat_id=user.telegram_id,
+                        text=tr(language, "package_expired_user"),
+                        parse_mode=ParseMode.HTML,
+                    )
+                except TelegramError:
+                    logger.warning("Could not notify user %s about package expiry", user.telegram_id)
+
+                await self.notify_admins(
+                    context.application,
+                    tr("az", "package_expired_admin", telegram_id=user.telegram_id),
+                )
+            except Exception as exc:
+                logger.exception("Expiry processing failed for user %s: %s", user.telegram_id, exc)
+
+        due_users = self.db.get_due_users(now)
+
         for user in due_users:
             try:
                 await self.deliver_one_product(context.application, user)
@@ -555,7 +580,7 @@ class ExLinksBot:
 
     async def deliver_one_product(self, application: Application, user: User) -> None:
         language = user.language_code or "en"
-        if not user.package_code:
+        if not user.package_code or not user.package_active:
             return
 
         product = self.db.get_random_unsent_product(user.id)
