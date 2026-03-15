@@ -30,47 +30,6 @@ def _parse_admin_ids(raw: str) -> set[int]:
     return ids
 
 
-@dataclass(frozen=True)
-class Settings:
-    bot_token: str
-    admin_ids: set[int]
-    support_chat_id: int | None
-    database_url: str
-    brand_name: str
-    delivery_check_seconds: int
-
-
-PLANS: dict[str, dict[str, object]] = {
-    "every_3_days": {
-        "days": 3,
-        "prices": {
-            "az": "9.99 AZN",
-            "en": "$5.99",
-            "ru": "549.99₽",
-        },
-    },
-    "every_2_days": {
-        "days": 2,
-        "prices": {
-            "az": "19.99 AZN",
-            "en": "$11.99",
-            "ru": "1199₽",
-        },
-    },
-    "daily": {
-        "days": 1,
-        "prices": {
-            "az": "29.99 AZN",
-            "en": "$17.99",
-            "ru": "1699.99₽",
-        },
-    },
-}
-
-
-DEFAULT_DATABASE_URL = f"sqlite:///{(DATA_DIR / 'bot.db').as_posix()}"
-
-
 def _parse_optional_int(raw: str) -> int | None:
     value = raw.strip()
     if not value:
@@ -79,6 +38,49 @@ def _parse_optional_int(raw: str) -> int | None:
         return int(value)
     except ValueError:
         return None
+
+
+@dataclass(frozen=True)
+class Settings:
+    bot_token: str
+    admin_ids: set[int]
+    support_chat_id: int | None
+    database_url: str
+    brand_name: str
+    delivery_check_seconds: int
+    startapp_url: str
+    miniapp_url: str
+
+
+PLANS: dict[str, dict[str, object]] = {
+    "every_3_days": {
+        "days": 3,
+        "prices": {
+            "az": "9.99 AZN",
+            "en": "$5.99",
+            "ru": "549.99 ₽",
+        },
+    },
+    "every_2_days": {
+        "days": 2,
+        "prices": {
+            "az": "19.99 AZN",
+            "en": "$11.99",
+            "ru": "1199.99 ₽",
+        },
+    },
+    "daily": {
+        "days": 1,
+        "prices": {
+            "az": "29.99 AZN",
+            "en": "$17.99",
+            "ru": "1699.99 ₽",
+        },
+    },
+}
+
+
+DEFAULT_DATABASE_URL = f"sqlite:///{(DATA_DIR / 'bot.db').as_posix()}"
 
 
 settings = Settings(
@@ -90,4 +92,6 @@ settings = Settings(
     ),
     brand_name=os.getenv("BRAND_NAME", "exlinks.ai"),
     delivery_check_seconds=max(15, int(os.getenv("DELIVERY_CHECK_SECONDS", "60"))),
+    startapp_url=os.getenv("STARTAPP_URL", "https://t.me/exlinks_ai_bot?startapp"),
+    miniapp_url=os.getenv("MINIAPP_URL", "https://exlinks-web.onrender.com/miniapp"),
 )
