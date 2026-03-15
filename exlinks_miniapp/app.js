@@ -594,9 +594,9 @@ function renderAdmin() {
               <div class="user-desc">${escapeHtml(user.next_delivery || "-")}</div>
 
               <div class="user-actions">
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_3_days">19.99</button>
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_2_days">29.99</button>
-                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="daily">49.99</button>
+                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_3_days">9.99</button>
+                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="every_2_days">19.99</button>
+                <button class="small-btn activate-btn" data-user="${user.telegram_id}" data-plan="daily">29.99</button>
                 <button class="small-btn danger deactivate-btn" data-user="${user.telegram_id}">${tr("deactivate")}</button>
               </div>
             </div>
