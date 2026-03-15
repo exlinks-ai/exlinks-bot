@@ -9,10 +9,13 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from sqlalchemy import select
+from telegram import Bot
+from telegram.constants import ParseMode
+from telegram.error import TelegramError
 
 from exlinks_bot.config import PLANS, settings
 from exlinks_bot.db import Database, Delivery, Product, User
-from exlinks_bot.i18n import LANGUAGES, plan_label, plan_price
+from exlinks_bot.i18n import LANGUAGES, plan_label, plan_price, tr
 from exlinks_bot.services import format_dt, next_delivery_for_plan, utc_now
 
 app = FastAPI(title="ExLinks Mini App API", version="2.0.0")
@@ -136,7 +139,7 @@ def contact(payload: ContactPayload) -> dict:
 
 
 @app.post("/api/admin/package")
-def admin_package(payload: AdminPackagePayload) -> dict:
+async def admin_package(payload: AdminPackagePayload) -> dict:
     if payload.admin_telegram_id not in settings.admin_ids:
         raise HTTPException(status_code=403, detail="Admin only")
 
@@ -153,13 +156,23 @@ def admin_package(payload: AdminPackagePayload) -> dict:
 
     next_delivery = next_delivery_for_plan(payload.package_code)
     package_expires_at = utc_now() + timedelta(days=30)
-    db.set_package(
+
+    user = db.set_package(
         payload.target_telegram_id,
         payload.package_code,
         next_delivery,
         package_expires_at,
     )
-    return {"ok": True, "status": "activated"}
+    if user is None:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    delivered_now = await _deliver_first_product_now(user)
+
+    return {
+        "ok": True,
+        "status": "activated",
+        "delivered_now": delivered_now,
+    }
 
 
 @app.get("/api/me")
@@ -226,6 +239,37 @@ def miniapp_root():
     if index_file.exists():
         return FileResponse(index_file)
     raise HTTPException(status_code=404, detail="Mini app not found")
+
+
+async def _deliver_first_product_now(user: User) -> bool:
+    if not user.package_active or not user.package_code:
+        return False
+
+    product = db.get_random_unsent_product(user.id)
+    if product is None:
+        next_delivery = next_delivery_for_plan(user.package_code)
+        db.update_next_delivery(user.id, next_delivery)
+        return False
+
+    language = user.language_code if user.language_code in LANGUAGES else "en"
+    safe_name = product.name
+    safe_link = product.link
+    next_delivery = next_delivery_for_plan(user.package_code)
+    bot = Bot(token=settings.bot_token)
+
+    try:
+        await bot.send_message(
+            chat_id=user.telegram_id,
+            text=tr(language, "new_product", name=safe_name, link=safe_link),
+            parse_mode=ParseMode.HTML,
+            disable_web_page_preview=False,
+        )
+        db.add_delivery(user.id, product.id)
+        db.update_next_delivery(user.id, next_delivery)
+        return True
+    except TelegramError:
+        db.update_next_delivery(user.id, next_delivery)
+        return False
 
 
 def _get_latest_or_next_product(user: User) -> dict:
