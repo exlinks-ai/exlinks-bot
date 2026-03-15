@@ -5,7 +5,7 @@ if (tg) {
   tg.expand();
 }
 
-const API_BASE = "http://127.0.0.1:8000";
+const API_BASE = window.location.origin;
 const FALLBACK_LANG = "en";
 const FALLBACK_TELEGRAM_ID = 2091774116;
 
