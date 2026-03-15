@@ -243,10 +243,12 @@ def miniapp_root():
 
 async def _deliver_first_product_now(user: User) -> bool:
     if not user.package_active or not user.package_code:
+        print("deliver_now: inactive or no package")
         return False
 
     product = db.get_random_unsent_product(user.id)
     if product is None:
+        print("deliver_now: no product found")
         next_delivery = next_delivery_for_plan(user.package_code)
         db.update_next_delivery(user.id, next_delivery)
         return False
@@ -258,6 +260,7 @@ async def _deliver_first_product_now(user: User) -> bool:
     bot = Bot(token=settings.bot_token)
 
     try:
+        print(f"deliver_now: sending product_id={product.id} to telegram_id={user.telegram_id}")
         await bot.send_message(
             chat_id=user.telegram_id,
             text=tr(language, "new_product", name=safe_name, link=safe_link),
@@ -266,8 +269,14 @@ async def _deliver_first_product_now(user: User) -> bool:
         )
         db.add_delivery(user.id, product.id)
         db.update_next_delivery(user.id, next_delivery)
+        print("deliver_now: success")
         return True
-    except TelegramError:
+    except TelegramError as exc:
+        print(f"deliver_now: telegram error -> {exc}")
+        db.update_next_delivery(user.id, next_delivery)
+        return False
+    except Exception as exc:
+        print(f"deliver_now: generic error -> {exc}")
         db.update_next_delivery(user.id, next_delivery)
         return False
 
